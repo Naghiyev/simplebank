@@ -11,8 +11,28 @@ on:
 
 jobs:
 
-  build:
+  build-and-test:
+    name: build-and_test
     runs-on: ubuntu-latest
+
+    services:
+        # Label used to access the service container
+        postgres:
+          # Docker Hub image
+          image: postgres:12
+          # Provide the password for postgres
+          env:
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+            POSTGRES_DB: simple_bank
+          # Set health checks to wait until postgres has started
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,6 +40,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 'stable'
+
+      - name: Run migrations
+        run: make migrate
 
       - name: Build
         run: go build -v ./...
