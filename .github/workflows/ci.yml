@@ -26,11 +26,15 @@ jobs:
             POSTGRES_USER: root
             POSTGRES_DB: simple_bank
           # Set health checks to wait until postgres has started
+          ports:
+            - 5432:5432
+
           options: >-
             --health-cmd pg_isready
             --health-interval 10s
             --health-timeout 5s
             --health-retries 5
+          
     
 
     steps:
@@ -40,6 +44,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 'stable'
+
       - name: install golang-migrate
         run: |
           curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz
