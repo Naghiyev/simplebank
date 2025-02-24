@@ -42,7 +42,7 @@ jobs:
           go-version: 'stable'
 
       - name: Run migrations
-        run: make migrate
+        run: make migrateup
 
       - name: Build
         run: go build -v ./...
