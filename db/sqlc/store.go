@@ -4,9 +4,19 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	_ "github.com/golang/mock/mockgen/model"
 )
 
-type Store struct {
+//go:generate mockgen -destination=../mock/store.go -package=db/sqlc simple-bank/db/sqlc Store
+
+// for mocking db functionalites
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+}
+
+// provides all functionalites to slq db
+type SqlStore struct {
 	*Queries
 	db *sql.DB
 }
@@ -25,8 +35,8 @@ type TransferTxResult struct {
 	ToEntry     Entry    `json:"to_entry"`
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SqlStore{
 		Queries: New(db),
 		db:      db,
 	}
@@ -34,7 +44,7 @@ func NewStore(db *sql.DB) *Store {
 
 var txKey = struct{}{}
 
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SqlStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -53,7 +63,7 @@ func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 	return tx.Commit()
 }
 
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *SqlStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(queries *Queries) error {
