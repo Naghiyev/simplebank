@@ -35,6 +35,6 @@ DELETE from accounts where id= $1;
 
 -- name: AddAccountBalance :one
 UPDATE accounts
-SET balance = balance + sqlc.arg(Amount)
+SET balance = balance + sqlc.arg(amount)
 WHERE id = sqlc.arg(id)
     RETURNING *;
