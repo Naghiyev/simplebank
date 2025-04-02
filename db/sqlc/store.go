@@ -7,7 +7,7 @@ import (
 	_ "github.com/golang/mock/mockgen/model"
 )
 
-//go:generate mockgen -destination=../mock/store.go -package=db/sqlc simple-bank/db/sqlc Store
+//go:generate mockgen -destination=../mock/store.go -package=db/sqlc simple-banking/db/sqlc Store
 
 // for mocking db functionalites
 type Store interface {
