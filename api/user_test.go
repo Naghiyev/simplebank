@@ -92,7 +92,7 @@ func TestCreateUserApi(t *testing.T) {
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 			//start test http server and send request
-			server := NewServer(store)
+			server := newTestServer(t, nil)
 
 			recorder := httptest.NewRecorder()
 
